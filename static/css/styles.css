@@ -1,0 +1,95 @@
+/* Variables CSS para Farmacia_CANR */
+:root {
+    --primary-color: #4e73df; /* Azul profesional */
+    --secondary-color: #f8f9fc; /* Gris muy claro para fondos */
+    --success-color: #1cc88a; /* Verde para botones de 'Agregar' o 'Aceptar' */
+    --danger-color: #e74a3b; /* Rojo para botones de 'Eliminar' o 'Cerrar sesión' */
+    --text-color: #5a5c69;
+}
+
+/* Fondo global */
+body {
+    background-image: url('../images/fondo.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Inter', sans-serif !important;
+    padding-top: 90px !important;
+    color: var(--text-color) !important;
+}
+
+/* Transparencia para las tarjetas (para que se vea el fondo detrás) */
+.card {
+    background-color: rgba(255, 255, 255, 0.9) !important; /* Blanco suave semitransparente */
+    backdrop-filter: blur(5px) !important; /* Efecto cristal */
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.container {
+    margin-top: 20px !important;
+    padding: 40px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 10px !important;
+}
+
+/* Barra de navegación */
+.navbar {
+    height: 70px !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    background-color: white !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+/* Logo más grande y controlado */
+.navbar-brand img {
+    height: 60px !important;
+    width: auto !important;
+    object-fit: contain !important;
+}
+
+.navbar-brand {
+    padding: 0.5rem 0 !important;
+}
+
+.nav-link {
+    color: var(--text-color) !important;
+    padding: 0.5rem 1rem !important;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-color) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-success-custom {
+    background-color: var(--success-color) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-danger-custom {
+    background-color: var(--danger-color) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-accent-custom {
+    background-color: var(--danger-color) !important;
+    border: none !important;
+    color: white !important;
+}
+
+/* Tema rojo personalizado para páginas específicas */
+.theme-red-custom {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
+    min-height: 100vh;
+    padding-bottom: 20px;
+    color: white !important;
+}

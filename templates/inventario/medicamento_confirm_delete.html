@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Eliminar Medicamento - Farmacia_CANR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirm-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 3rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .confirm-title {
+        color: #dc3545;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    .btn-custom {
+        padding: 0.8rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+        color: white;
+    }
+    .btn-delete:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(220, 53, 69, 0.4);
+        color: white;
+    }
+    .btn-cancel {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        border: none;
+        color: white;
+    }
+    .btn-cancel:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(108, 117, 125, 0.4);
+        color: white;
+    }
+    .medicamento-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #666;
+    }
+    .info-value {
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="confirm-container">
+            <h2 class="confirm-title text-center">
+                ⚠️ Confirmar Eliminación
+            </h2>
+            
+            <p class="text-center">
+                ¿Estás seguro de que deseas eliminar el siguiente medicamento?
+            </p>
+
+            <div class="medicamento-info">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <span class="info-label">Nombre:</span>
+                        <span class="info-value">{{ object.nombre }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <span class="info-label">Precio:</span>
+                        <span class="info-value">${{ object.precio }}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <span class="info-label">Stock:</span>
+                        <span class="info-value">{{ object.stock }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <span class="info-label">Vencimiento:</span>
+                        <span class="info-value">{{ object.fecha_vencimiento|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+                {% if object.descripcion %}
+                <div class="mb-3">
+                    <span class="info-label">Descripción:</span>
+                    <span class="info-value">{{ object.descripcion }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer. El medicamento será eliminado permanentemente del inventario.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="{% url 'inventario:lista_medicamentos' %}" class="btn btn-custom btn-cancel">
+                        ❌ Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-custom btn-delete">
+                        🗑️ Eliminar Medicamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block title %}Inventario de Medicamentos - Farmacia_CANR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 2rem;
+    }
+    .table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .table thead th {
+        border: none;
+        font-weight: 600;
+    }
+    .product-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #667eea;
+    }
+    .stock-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .stock-high {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .stock-medium {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .stock-low {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .btn-custom {
+        padding: 0.6rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-home {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+    }
+    .btn-home:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    .btn-add {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border: none;
+        color: white;
+    }
+    .btn-add:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(56, 239, 125, 0.4);
+        color: white;
+    }
+    .btn-edit {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border: none;
+        color: white;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        color: white;
+    }
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+        color: white;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        color: white;
+    }
+    .page-title {
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 2rem;
+    }
+    .row-vencido {
+        background-color: #fff3cd !important;
+    }
+    .badge-vencido {
+        background-color: #dc3545;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1 class="text-center page-title">📦 Inventario de Medicamentos</h1>
+                
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Listado de Medicamentos</h4>
+                        <div>
+                            <a href="{% url 'core:home' %}" class="btn btn-custom btn-home me-2">
+                                🏠 Volver al Inicio
+                            </a>
+                            <a href="{% url 'inventario:crear_medicamento' %}" class="btn btn-custom btn-add">
+                                ➕ Agregar Medicamento
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de búsqueda y filtro -->
+                    <form method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o descripción..." value="{{ request.GET.q }}">
+                            </div>
+                            <div class="col-md-4">
+                                <select name="categoria" class="form-control">
+                                    <option value="">Todas las categorías</option>
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria.id }}" {% if categoria.id|slugify == categoria_seleccionada or categoria.id|stringformat:"s" == categoria_seleccionada %}selected{% endif %}>
+                                            {{ categoria.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">🔍 Filtrar</button>
+                            </div>
+                        </div>
+                        {% if request.GET.q or request.GET.categoria %}
+                        <div class="mt-2">
+                            <a href="{% url 'inventario:lista_medicamentos' %}" class="btn btn-sm btn-secondary">❌ Limpiar filtros</a>
+                        </div>
+                        {% endif %}
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Fecha Vencimiento</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicamento in medicamentos %}
+                                <tr data-vencimiento="{{ medicamento.fecha_vencimiento|date:'Y-m-d' }}">
+                                    <td class="align-middle">
+                                        {% if medicamento.imagen %}
+                                            <img src="{{ medicamento.imagen.url }}" alt="{{ medicamento.nombre }}" class="product-image">
+                                        {% else %}
+                                            <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                                                <span class="text-muted">📷</span>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        <strong>{{ medicamento.nombre }}</strong>
+                                        {% if medicamento.descripcion %}
+                                            <br><small class="text-muted">{{ medicamento.descripcion|truncatewords:10 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge bg-primary fs-6">${{ medicamento.precio }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if medicamento.stock == 0 %}
+                                            <span class="badge bg-danger rounded-pill">Agotado</span>
+                                        {% else %}
+                                            <span class="badge bg-success rounded-pill">Disponible: {{ medicamento.stock }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex align-items-center">
+                                            <span>{{ medicamento.fecha_vencimiento|date:"d/m/Y" }}</span>
+                                            <span class="badge bg-danger rounded-pill ms-2 badge-vencido d-none" style="white-space: nowrap; font-size: 0.75rem;">
+                                                ⚠️ ¡VENCIDO!
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'inventario:editar_medicamento' medicamento.pk %}" class="btn btn-edit">
+                                                ✏️ Editar
+                                            </a>
+                                            <a href="{% url 'inventario:eliminar_medicamento' medicamento.pk %}" class="btn btn-delete">
+                                                🗑️ Eliminar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <h4>📭 No hay medicamentos registrados</h4>
+                                            <p class="mb-0">Comienza agregando tu primer medicamento al inventario.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if medicamentos %}
+                    <div class="mt-3 text-muted small">
+                        Total de medicamentos: {{ medicamentos|length }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        const filas = document.querySelectorAll('tbody tr[data-vencimiento]');
+        
+        filas.forEach(function(fila) {
+            const fechaVencimientoStr = fila.getAttribute('data-vencimiento');
+            const fechaVencimiento = new Date(fechaVencimientoStr);
+            fechaVencimiento.setHours(0, 0, 0, 0);
+            
+            if (fechaVencimiento <= hoy) {
+                fila.classList.add('row-vencido');
+                const badge = fila.querySelector('.badge-vencido');
+                if (badge) {
+                    badge.classList.remove('d-none');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
