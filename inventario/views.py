@@ -1,14 +1,16 @@
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .models import Medicamento, Categoria
 from .forms import MedicamentoForm
 
+@login_required
 def index(request):
     return render(request, 'inventario/index.html')
 
-class MedicamentoListView(ListView):
+class MedicamentoListView(LoginRequiredMixin, ListView):
     model = Medicamento
     template_name = 'inventario/lista_medicamentos.html'
     context_object_name = 'medicamentos'

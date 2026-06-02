@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models, transaction
 from .forms import VentaForm
 from .models import Venta, DetalleVenta
 
+@login_required
 def index(request):
     # Obtener todos los detalles de venta ordenados por fecha descendente
     detalles = DetalleVenta.objects.select_related('venta', 'medicamento').order_by('-venta__fecha')
@@ -23,6 +26,7 @@ def index(request):
     
     return render(request, 'ventas/index.html', context)
 
+@login_required
 def registrar_venta(request):
     if request.method == 'POST':
         form = VentaForm(request.POST)
